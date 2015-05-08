@@ -2,10 +2,9 @@
 #include "cell.h"
 
 Game::Game(QWidget *parent)
+    : QGraphicsView(parent)
 {
     // приготавливаем наш вектор, хранящий информацию о клетках
-    for(int i = 0; i < FILDE_SIZE; i++)
-        cellMap.push_back(0);
 
     // новая сцена
     scene = new QGraphicsScene();
@@ -20,85 +19,101 @@ Game::Game(QWidget *parent)
     // следим за мышью
     setMouseTracking(true);
 
-    // создадим клетки
-    cell0 = new Cell(0);
-    cell1 = new Cell(1);
-    cell2 = new Cell(2);
-    cell3 = new Cell(3);
-    cell4 = new Cell(4);
-    cell5 = new Cell(5);
-    cell6 = new Cell(6);
-    cell7 = new Cell(7);
-    cell8 = new Cell(8);
+    // создадим клетки и добавим на сцену
+    fieldSize = 15;
+    cellSize = 30;
 
+    int w = scene->width();
+    int h = scene->height();
+    int startPosX = w/2 - (cellSize / 2) * fieldSize;
+    int startPosY = h/2 - (cellSize / 2) * fieldSize;
 
-    // добавим на сцену клетки
-    scene->addItem(cell0);
-    scene->addItem(cell1);
-    scene->addItem(cell2);
-    scene->addItem(cell3);
-    scene->addItem(cell4);
-    scene->addItem(cell5);
-    scene->addItem(cell6);
-    scene->addItem(cell7);
-    scene->addItem(cell8);
-
-    show();
+    for(int i = 0; i < fieldSize; i++)
+    {
+        for(int j = 0; j < fieldSize; j++)
+        {
+            cell = new Cell(i * fieldSize + j,
+                            this,
+                            startPosX + j * cellSize,
+                            startPosY + i * cellSize,
+                            cellSize);
+            cells << cell;
+            scene->addItem(cell);
+        }
+    }
+    // не помню зачем здесь этот show. Скорее всего не нужен
+    //show();
 }
 
 void
 Game::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsItem *curItem;
-    Cell *cellItem;
 
-    // проверим не закончилась ли игра
-    int sum = 0;
-    for(int i = 0; i < FILDE_SIZE; i++)
-        sum += cellMap.at(i);
-
-    if(sum >= FILDE_SIZE)
+    QRect r(scene->width()/2 - (cellSize / 2) * fieldSize,
+            scene->height()/2 - (cellSize / 2) * fieldSize,
+            fieldSize * cellSize,
+            fieldSize * cellSize);
+    if (r.contains(event->pos())) // это клетка!
     {
-        cell0->setBrush(* new QBrush(Qt::white));
-        cell1->setBrush(* new QBrush(Qt::white));
-        cell2->setBrush(* new QBrush(Qt::white));
-        cell3->setBrush(* new QBrush(Qt::white));
-        cell4->setBrush(* new QBrush(Qt::white));
-        cell5->setBrush(* new QBrush(Qt::white));
-        cell6->setBrush(* new QBrush(Qt::white));
-        cell7->setBrush(* new QBrush(Qt::white));
-        cell8->setBrush(* new QBrush(Qt::white));
-
-        cellMap.clear();
-        for(int i = 0; i < FILDE_SIZE; i++)
-            cellMap.push_back(0);
-    }
-    else
-    {
-        // получаем item из под курсора
-        curItem = itemAt(event->x(), event->y());
-
-        // если там что-то есть
-        if(curItem)
-        {// и если это преобразуется в клетку
-            if(cellItem = static_cast<Cell *>(curItem));
-            {// и если место свободно
-                if(!cellMap.at(cellItem->num))
-                {// красим и говорим, что место занято
-                    if(turn == 0)
-                    {
-                        cellItem->setBrush(* new QBrush(Qt::red));
-                        turn++;
-                    }
-                    else if(turn == 1)
-                    {
-                        cellItem->setBrush(* new QBrush(Qt::blue));
-                        turn--;
-                    }
-                    cellMap.at(cellItem->num) = 1;
-                }
+        if(std::all_of(cells.begin(),
+                       cells.end(),
+                       [](Cell* c) {
+                       return c->color() != Qt::white; }))
+        {
+            for(auto c : cells) {
+                c->setColor(Qt::white);
             }
-            qDebug() << curItem;
+        }
+        else
+        {
+            curItem = itemAt(event->x(), event->y());
+            Cell *cellItem = static_cast<Cell *>(curItem);
+            if (check(cellItem)) {
+                QVector <Cell *> cross = neighbours(cellItem);
+                cross << cellItem;
+                if(turn % 2 == 0) {
+                    for (auto c : cross) {
+                        c->setColor(Qt::red);
+                    }
+                } else {
+                    for (auto c : cross) {
+                        c->setColor(Qt::blue);
+                    }
+                }
+                turn = (turn + 1) % 2;
+            }
         }
     }
+}
+
+bool Game::check(Cell *c)
+{
+    return check(c->num);
+}
+
+bool Game::check(int num)
+{
+    if (num < fieldSize) return false;                    // top border
+    if (num % fieldSize == 0) return false;               // left
+    if (num % fieldSize == fieldSize - 1) return false;   // right
+    if (num >= fieldSize * (fieldSize - 1)) return false; // bottom
+    QVector <Cell *> nei = neighbours(num);
+    return std::all_of(nei.begin(), nei.end(),
+                    [](Cell *c) {return c->color() == Qt::white;});
+}
+
+QVector<Cell *> Game::neighbours(Cell *c)
+{
+    return neighbours(c->num);
+}
+
+QVector<Cell *> Game::neighbours(int num)
+{
+    QVector<Cell *> neigh;
+    neigh << cells.at(num - 1)
+          << cells.at(num + 1)
+          << cells.at(num - fieldSize)
+          << cells.at(num + fieldSize);
+    return neigh;
 }

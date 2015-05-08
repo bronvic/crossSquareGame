@@ -5,11 +5,10 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QVector>
-#include <vector>
+#include <QPointF>
+#include <algorithm>
 
-#define FILDE_SIZE 9
-
-#include "cell.h"
+class Cell;
 
 class Game : public QGraphicsView
 {
@@ -19,20 +18,21 @@ public:
     void mousePressEvent(QMouseEvent *event);
 
     QGraphicsScene * scene;
-    Cell * cell0;
-    Cell * cell1;
-    Cell * cell2;
-    Cell * cell3;
-    Cell * cell4;
-    Cell * cell5;
-    Cell * cell6;
-    Cell * cell7;
-    Cell * cell8;
+    Cell *cell;
+    QPointF null_point;
 
-    std::vector<int> cellMap;
+protected:
+    static int a;
+
 private:
-    //QVector<bool> cellMap;
-    int turn = 0;
+    bool check(int num);
+    bool check(Cell *c);
+    QVector <Cell *> neighbours(Cell *c);
+    QVector <Cell *> neighbours(int num);
+    int fieldSize;
+    int cellSize;
+    QVector<Cell*> cells;
+    int turn = 0;    
 };
 
 #endif // GAME_H
