@@ -15,6 +15,7 @@ class Game : public QGraphicsView
 public:
     Game(QWidget *parent = 0);
 
+    void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
     QGraphicsScene * scene;
@@ -25,8 +26,10 @@ protected:
     static int a;
 
 private:
+    int oldCross;
     bool check(int num);
     bool check(Cell *c);
+    bool check(QPoint p);
     QVector <Cell *> neighbours(Cell *c);
     QVector <Cell *> neighbours(int num);
     int fieldSize;

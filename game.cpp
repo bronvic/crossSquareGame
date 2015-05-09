@@ -3,6 +3,7 @@
 
 Game::Game(QWidget *parent)
     : QGraphicsView(parent)
+    , oldCross(-1)
 {
     // приготавливаем наш вектор, хранящий информацию о клетках
 
@@ -20,7 +21,7 @@ Game::Game(QWidget *parent)
     setMouseTracking(true);
 
     // создадим клетки и добавим на сцену
-    fieldSize = 15;
+    fieldSize = 4;
     cellSize = 30;
 
     int w = scene->width();
@@ -45,8 +46,49 @@ Game::Game(QWidget *parent)
     //show();
 }
 
-void
-Game::mousePressEvent(QMouseEvent *event)
+void Game::mouseMoveEvent(QMouseEvent *event)
+{
+    if(check(event->pos()))
+    {
+        auto curItem = itemAt(event->x(), event->y());
+        Cell *cellItem = static_cast<Cell *>(curItem);
+
+        if(oldCross == -1) { oldCross = cellItem->num; }
+
+        if (oldCross != cellItem->num) {
+            QVector <Cell *> oldCrossCells = neighbours(oldCross);
+            oldCrossCells << cells.at(oldCross);
+            for (auto c : oldCrossCells) {
+                c->setColor(Qt::white);
+            }
+        } else { if(cells.at(oldCross)->color() != Qt::white) return; }
+
+        oldCross = cellItem->num;
+
+        QVector <Cell *> cross = neighbours(cellItem);
+        cross << cellItem;
+
+        if(turn % 2 == 0) {
+            for (auto c : cross) {
+                c->setColor(Qt::lightGray);
+            }
+        } else {
+            for (auto c : cross) {
+                c->setColor(Qt::lightGray);
+            }
+        }
+    } else {
+        if (oldCross == -1) return;
+        QVector <Cell *> oldCrossCells = neighbours(oldCross);
+        oldCrossCells << cells.at(oldCross);
+        for (auto c : oldCrossCells) {
+            c->setColor(Qt::white);
+        }
+        oldCross = -1;
+    }
+}
+
+void Game::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsItem *curItem;
 
@@ -81,6 +123,11 @@ Game::mousePressEvent(QMouseEvent *event)
                         c->setColor(Qt::blue);
                     }
                 }
+                // костыль
+                cellItem->setPen(* new QPen(Qt::NoPen));
+                cross.at(1)->setPen(* new QPen(Qt::NoPen));
+                cross.at(3)->setPen(* new QPen(Qt::NoPen));
+                oldCross = -1;
                 turn = (turn + 1) % 2;
             }
         }
@@ -92,6 +139,23 @@ bool Game::check(Cell *c)
     return check(c->num);
 }
 
+bool Game::check(QPoint p)
+{
+
+    QRect r(scene->width()/2 - (cellSize / 2) * fieldSize,
+            scene->height()/2 - (cellSize / 2) * fieldSize,
+            fieldSize * cellSize,
+            fieldSize * cellSize);
+    if (r.contains(p)) // это клетка!
+    {
+        QGraphicsItem *curItem = itemAt(p.x(), p.y());
+        Cell *c = static_cast<Cell *>(curItem);
+        return check(c->num);
+    } else {
+        return false;
+    }
+}
+
 bool Game::check(int num)
 {
     if (num < fieldSize) return false;                    // top border
@@ -100,7 +164,8 @@ bool Game::check(int num)
     if (num >= fieldSize * (fieldSize - 1)) return false; // bottom
     QVector <Cell *> nei = neighbours(num);
     return std::all_of(nei.begin(), nei.end(),
-                    [](Cell *c) {return c->color() == Qt::white;});
+                    [](Cell *c) {return (c->color() == Qt::white) ||
+                                        (c->color() == Qt::lightGray);});
 }
 
 QVector<Cell *> Game::neighbours(Cell *c)
