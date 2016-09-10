@@ -26,7 +26,7 @@ protected:
     static int a;
 
 private:
-    int oldCross;
+    int oldCrossNum;
     bool check(int num);
     bool check(Cell *c);
     bool check(QPoint p);

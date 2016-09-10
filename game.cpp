@@ -3,7 +3,7 @@
 
 Game::Game(QWidget *parent)
     : QGraphicsView(parent)
-    , oldCross(-1)
+    , oldCrossNum(-1)
 {
     // приготавливаем наш вектор, хранящий информацию о клетках
 
@@ -21,7 +21,7 @@ Game::Game(QWidget *parent)
     setMouseTracking(true);
 
     // создадим клетки и добавим на сцену
-    fieldSize = 4;
+    fieldSize = 9;
     cellSize = 30;
 
     int w = scene->width();
@@ -53,17 +53,15 @@ void Game::mouseMoveEvent(QMouseEvent *event)
         auto curItem = itemAt(event->x(), event->y());
         Cell *cellItem = static_cast<Cell *>(curItem);
 
-        if(oldCross == -1) { oldCross = cellItem->num; }
+        if(oldCrossNum == -1) { oldCrossNum = cellItem->num; }
 
-        if (oldCross != cellItem->num) {
-            QVector <Cell *> oldCrossCells = neighbours(oldCross);
-            oldCrossCells << cells.at(oldCross);
-            for (auto c : oldCrossCells) {
+        if (oldCrossNum != cellItem->num) {
+            QVector <Cell *> oldCrossNumCells = neighbours(oldCrossNum);
+            oldCrossNumCells << cells.at(oldCrossNum);
+            for (auto c : oldCrossNumCells) {
                 c->setColor(Qt::white);
             }
-        } else { if(cells.at(oldCross)->color() != Qt::white) return; }
-
-        oldCross = cellItem->num;
+        } else { if(cells.at(oldCrossNum)->color() != Qt::white) return; }
 
         QVector <Cell *> cross = neighbours(cellItem);
         cross << cellItem;
@@ -77,14 +75,17 @@ void Game::mouseMoveEvent(QMouseEvent *event)
                 c->setColor(Qt::lightGray);
             }
         }
+
+        oldCrossNum = cellItem->num;
+
     } else {
-        if (oldCross == -1) return;
-        QVector <Cell *> oldCrossCells = neighbours(oldCross);
-        oldCrossCells << cells.at(oldCross);
-        for (auto c : oldCrossCells) {
+        if (oldCrossNum == -1) return;
+        QVector <Cell *> oldCrossNumCells = neighbours(oldCrossNum);
+        oldCrossNumCells << cells.at(oldCrossNum);
+        for (auto c : oldCrossNumCells) {
             c->setColor(Qt::white);
         }
-        oldCross = -1;
+        oldCrossNum = -1;
     }
 }
 
@@ -110,6 +111,8 @@ void Game::mousePressEvent(QMouseEvent *event)
         else
         {
             curItem = itemAt(event->x(), event->y());
+            if(curItem == NULL)// на левой и нижней границе не возвращает клетку на последнем пикселе
+                return;
             Cell *cellItem = static_cast<Cell *>(curItem);
             if (check(cellItem)) {
                 QVector <Cell *> cross = neighbours(cellItem);
@@ -124,10 +127,10 @@ void Game::mousePressEvent(QMouseEvent *event)
                     }
                 }
                 // костыль
-                cellItem->setPen(* new QPen(Qt::NoPen));
-                cross.at(1)->setPen(* new QPen(Qt::NoPen));
-                cross.at(3)->setPen(* new QPen(Qt::NoPen));
-                oldCross = -1;
+                //cellItem->setPen(* new QPen(Qt::NoPen));
+                //cross.at(1)->setPen(* new QPen(Qt::NoPen));
+                //cross.at(3)->setPen(* new QPen(Qt::NoPen));
+                oldCrossNum = -1;
                 turn = (turn + 1) % 2;
             }
         }
@@ -141,14 +144,24 @@ bool Game::check(Cell *c)
 
 bool Game::check(QPoint p)
 {
+/*
+    qDebug() << scene->width()/2 - (cellSize / 2) * fieldSize << " - "
+             << scene->width()/2 - (cellSize / 2) * fieldSize + fieldSize * cellSize << endl;
+    qDebug() << scene->height()/2 - (cellSize / 2) * fieldSize << " - "
+             << scene->height()/2 - (cellSize / 2) * fieldSize + fieldSize * cellSize << endl;
 
+    qDebug() << "point(" << p.x() << "," << p.y() << ")"<< endl;
+    */
     QRect r(scene->width()/2 - (cellSize / 2) * fieldSize,
             scene->height()/2 - (cellSize / 2) * fieldSize,
             fieldSize * cellSize,
             fieldSize * cellSize);
+
     if (r.contains(p)) // это клетка!
     {
         QGraphicsItem *curItem = itemAt(p.x(), p.y());
+        if(curItem == NULL)// на левой и нижней границе не возвращает клетку на последнем пикселе
+            return false;
         Cell *c = static_cast<Cell *>(curItem);
         return check(c->num);
     } else {
