@@ -43,7 +43,7 @@ Game::Game(QWidget *parent)
         }
     }
     // не помню зачем здесь этот show. Скорее всего не нужен
-    //show();
+    show();
 }
 
 void Game::mouseMoveEvent(QMouseEvent *event)
@@ -130,6 +130,9 @@ void Game::mousePressEvent(QMouseEvent *event)
                 //cellItem->setPen(* new QPen(Qt::NoPen));
                 //cross.at(1)->setPen(* new QPen(Qt::NoPen));
                 //cross.at(3)->setPen(* new QPen(Qt::NoPen));
+
+                if(gameIsOver()){}
+
                 oldCrossNum = -1;
                 turn = (turn + 1) % 2;
             }
@@ -167,6 +170,11 @@ bool Game::check(QPoint p)
     } else {
         return false;
     }
+}
+
+bool Game::gameIsOver()
+{
+    return !std::any_of(cells.begin(), cells.end(), [&] (Cell *currCell){return check(currCell);});
 }
 
 bool Game::check(int num)

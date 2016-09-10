@@ -30,6 +30,7 @@ private:
     bool check(int num);
     bool check(Cell *c);
     bool check(QPoint p);
+    bool gameIsOver();
     QVector <Cell *> neighbours(Cell *c);
     QVector <Cell *> neighbours(int num);
     int fieldSize;
