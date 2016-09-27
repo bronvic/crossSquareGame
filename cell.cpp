@@ -1,7 +1,7 @@
 #include "cell.h"
 
 Cell::Cell(int number,
-           Game *curr_game,
+           GameView *curr_game,
            int px,
            int py,
            int cellSize,

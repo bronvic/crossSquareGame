@@ -11,8 +11,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Game *game = new Game();
-    game->show();
+    GameWindow *gameWindow = new GameWindow();
+    gameWindow->show();
+
+    __attribute__((unused))
+            GameLogic *gameLogic = new GameLogic();
 
     return a.exec();
 }

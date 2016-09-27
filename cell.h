@@ -17,11 +17,11 @@ class Cell : public QGraphicsRectItem
 {
 public:
     Cell(int number,
-         Game *curr_game,
+         GameView *curr_game,
          int px, int py,
          int cellSize,
          QGraphicsItem *parent = 0);
-    Game *game;
+    GameView *game;
     int num;
     void setColor(Qt::GlobalColor c);
     QColor color();

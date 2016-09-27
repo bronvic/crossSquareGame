@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QMainWindow>
 #include <QGraphicsView>
 #include <QWidget>
 #include <QGraphicsScene>
@@ -8,17 +9,19 @@
 #include <QPointF>
 #include <algorithm>
 
+#include <QMenuBar>
+
 class Cell;
 
-class Game : public QGraphicsView
+class GameView : public QGraphicsView
 {
 public:
-    Game(QWidget *parent = 0);
+    GameView(QWidget *parent = 0);
 
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
-    QGraphicsScene * scene;
+    QGraphicsScene *scene;
     Cell *cell;
     QPointF null_point;
 
@@ -36,7 +39,22 @@ private:
     int fieldSize;
     int cellSize;
     QVector<Cell*> cells;
-    int turn = 0;    
+    int turn = 0;
 };
+
+class GameLogic
+{
+public:
+    GameLogic();
+};
+
+class GameWindow : public QMainWindow
+{
+public:
+    GameWindow(QWidget *parent = 0);
+
+    GameView *view;
+};
+
 
 #endif // GAME_H

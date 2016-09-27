@@ -1,14 +1,31 @@
 #include "game.h"
 #include "cell.h"
 
-Game::Game(QWidget *parent)
+GameWindow::GameWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    // основные параметры
+    setFixedSize(800,600);
+    setWindowTitle("Крестики на квадратах");
+
+    // задать menubar
+    QMenuBar *menuBar = new QMenuBar(this);
+
+    QMenu *gameMenu = new QMenu("Игра");
+    menuBar->addMenu(gameMenu);
+
+    //setMenuBar(menuBar);
+
+    // создать сцену
+    view = new GameView(this);
+}
+
+GameView::GameView(QWidget *parent)
     : QGraphicsView(parent)
     , oldCrossNum(-1)
 {
-    // приготавливаем наш вектор, хранящий информацию о клетках
-
     // новая сцена
-    scene = new QGraphicsScene();
+    scene = new QGraphicsScene(this);
     scene->setSceneRect(0,0,800,600); // установить размер 800х600
 
     // установить сцену и настроить
@@ -16,6 +33,7 @@ Game::Game(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFixedSize(800,600);
+
 
     // следим за мышью
     setMouseTracking(true);
@@ -43,10 +61,15 @@ Game::Game(QWidget *parent)
         }
     }
     // не помню зачем здесь этот show. Скорее всего не нужен
-    show();
+    //show();
 }
 
-void Game::mouseMoveEvent(QMouseEvent *event)
+GameLogic::GameLogic()
+{
+
+}
+
+void GameView::mouseMoveEvent(QMouseEvent *event)
 {
     if(check(event->pos()))
     {
@@ -89,7 +112,7 @@ void Game::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void Game::mousePressEvent(QMouseEvent *event)
+void GameView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsItem *curItem;
 
@@ -140,12 +163,12 @@ void Game::mousePressEvent(QMouseEvent *event)
     }
 }
 
-bool Game::check(Cell *c)
+bool GameView::check(Cell *c)
 {
     return check(c->num);
 }
 
-bool Game::check(QPoint p)
+bool GameView::check(QPoint p)
 {
 /*
     qDebug() << scene->width()/2 - (cellSize / 2) * fieldSize << " - "
@@ -172,12 +195,12 @@ bool Game::check(QPoint p)
     }
 }
 
-bool Game::gameIsOver()
+bool GameView::gameIsOver()
 {
     return !std::any_of(cells.begin(), cells.end(), [&] (Cell *currCell){return check(currCell);});
 }
 
-bool Game::check(int num)
+bool GameView::check(int num)
 {
     if (num < fieldSize) return false;                    // top border
     if (num % fieldSize == 0) return false;               // left
@@ -189,12 +212,12 @@ bool Game::check(int num)
                                         (c->color() == Qt::lightGray);});
 }
 
-QVector<Cell *> Game::neighbours(Cell *c)
+QVector<Cell *> GameView::neighbours(Cell *c)
 {
     return neighbours(c->num);
 }
 
-QVector<Cell *> Game::neighbours(int num)
+QVector<Cell *> GameView::neighbours(int num)
 {
     QVector<Cell *> neigh;
     neigh << cells.at(num - 1)
