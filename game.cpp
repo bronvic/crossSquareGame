@@ -18,6 +18,7 @@ GameWindow::GameWindow(QWidget *parent)
 
     // создать сцену
     view = new GameView(this);
+	view->move(view->pos().x(), view->pos().y() + menuBar->height());
 }
 
 GameView::GameView(QWidget *parent)
