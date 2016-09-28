@@ -1,8 +1,6 @@
 #include "game.h"
 #include "cell.h"
 
-#include <QObject>
-
 GameWindow::GameWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -78,8 +76,6 @@ GameView::GameView(QWidget *parent)
             scene->addItem(cell);
         }
     }
-    // не помню зачем здесь этот show. Скорее всего не нужен
-    //show();
 }
 
 GameLogic::GameLogic()
