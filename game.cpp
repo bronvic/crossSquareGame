@@ -1,6 +1,8 @@
 #include "game.h"
 #include "cell.h"
 
+#include <QObject>
+
 GameWindow::GameWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -10,16 +12,31 @@ GameWindow::GameWindow(QWidget *parent)
 
     // задать menubar
     QMenuBar *menuBar = new QMenuBar(this);
+    setMenuBar(menuBar);
+
+
+    QAction *exitAction = new QAction("Выход");
+    //connect(exitAction, &QAction::triggered, this, this->close);
+    connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+
 
     QMenu *gameMenu = new QMenu("Игра");
-    menuBar->addMenu(gameMenu);
+    //gameMenu->addAction("Заново");
+    //gameMenu->addAction("Настройки");
+    gameMenu->addAction(exitAction);
 
-    //setMenuBar(menuBar);
+    QMenu *helpMenu = new QMenu("Справка");
+    helpMenu->addAction("Об игре");
+    helpMenu->addAction("О разработчиках");
+
+    menuBar->addMenu(gameMenu);
+    //menuBar->addMenu(helpMenu);
 
     // создать сцену
     view = new GameView(this);
-	view->move(view->pos().x(), view->pos().y() + menuBar->height());
+    view->move(view->pos().x(), view->pos().y() + menuBar->height());
 }
+
 
 GameView::GameView(QWidget *parent)
     : QGraphicsView(parent)

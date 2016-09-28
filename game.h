@@ -2,14 +2,19 @@
 #define GAME_H
 
 #include <QMainWindow>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+
 #include <QGraphicsView>
-#include <QWidget>
 #include <QGraphicsScene>
 #include <QVector>
 #include <QPointF>
 #include <algorithm>
 
-#include <QMenuBar>
+#include <QObject>
+
+#include <QWidget>
 
 class Cell;
 
@@ -50,6 +55,7 @@ public:
 
 class GameWindow : public QMainWindow
 {
+    Q_OBJECT
 public:
     GameWindow(QWidget *parent = 0);
 
