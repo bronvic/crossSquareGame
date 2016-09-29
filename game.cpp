@@ -1,6 +1,11 @@
 #include "game.h"
 #include "cell.h"
 
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QApplication>
+
 GameWindow::GameWindow(QWidget *parent)
     : QMainWindow(parent)
 {
