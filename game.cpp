@@ -1,6 +1,11 @@
 #include "game.h"
 #include "cell.h"
 
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QApplication>
+
 GameWindow::GameWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -12,23 +17,20 @@ GameWindow::GameWindow(QWidget *parent)
     QMenuBar *menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
 
+    QMenu *gameMenu = new QMenu("Игра", this);
+    menuBar->addMenu(gameMenu);
 
-    QAction *exitAction = new QAction("Выход");
-    //connect(exitAction, &QAction::triggered, this, this->close);
-    connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+    QAction *exitAction = gameMenu->addAction("Выход");
+    connect(exitAction, &QAction::triggered, &QApplication::quit);
 
-
-    QMenu *gameMenu = new QMenu("Игра");
     //gameMenu->addAction("Заново");
     //gameMenu->addAction("Настройки");
-    gameMenu->addAction(exitAction);
 
-    QMenu *helpMenu = new QMenu("Справка");
+    QMenu *helpMenu = new QMenu("Справка", this);
+    //menuBar->addMenu(helpMenu);
     helpMenu->addAction("Об игре");
     helpMenu->addAction("О разработчиках");
 
-    menuBar->addMenu(gameMenu);
-    //menuBar->addMenu(helpMenu);
 
     // создать сцену
     view = new GameView(this);

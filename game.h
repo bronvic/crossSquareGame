@@ -2,17 +2,12 @@
 #define GAME_H
 
 #include <QMainWindow>
-#include <QMenuBar>
-#include <QMenu>
 #include <QAction>
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QVector>
 #include <QPointF>
-#include <algorithm>
-
-#include <QObject>
 
 #include <QWidget>
 
