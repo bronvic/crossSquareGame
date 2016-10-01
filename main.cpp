@@ -14,8 +14,5 @@ int main(int argc, char *argv[])
     GameWindow *gameWindow = new GameWindow();
     gameWindow->show();
 
-    __attribute__((unused))
-            GameLogic *gameLogic = new GameLogic();
-
     return a.exec();
 }
