@@ -38,27 +38,24 @@ GameWindow::GameWindow(QWidget *parent)
 
     QMenu *gameMenu = new QMenu("Игра", this);
     menuBar->addMenu(gameMenu);
+    __attribute__((unused))
+            QAction *restartAction = gameMenu->addAction("Заново", view, &GameView::clearField, QKeySequence("F2"));
 
-    QAction *restartAction = gameMenu->addAction("Заново");
-    connect(restartAction, &QAction::triggered, view, &GameView::clearField);
-
-    QAction *settingsAction = gameMenu->addAction("Настройки");
-    connect(settingsAction, &QAction::triggered, this, &GameWindow::createSettingsWindow);
-
+    __attribute__((unused))
+            QAction *settingsAction = gameMenu->addAction("Настройки", this, &GameWindow::createSettingsWindow, QKeySequence("F3"));
     gameMenu->addSeparator();
 
-    QAction *exitAction = gameMenu->addAction("Выход");
-    connect(exitAction, &QAction::triggered, &QApplication::quit);
-
+    __attribute__((unused))
+            QAction *exitAction = gameMenu->addAction("Выход", &QApplication::quit, QKeySequence("Ctrl+Q"));
 
     QMenu *helpMenu = new QMenu("Справка", this);
     menuBar->addMenu(helpMenu);
 
-    QAction *aboutGameAction = helpMenu->addAction("Об игре");
-    connect(aboutGameAction, &QAction::triggered, this, &GameWindow::createAboutGameWindow);
+    __attribute__((unused))
+            QAction *aboutGameAction = helpMenu->addAction("Об игре", this, &GameWindow::createAboutGameWindow, QKeySequence("F1"));
 
-    QAction *aboutDevsAction = helpMenu->addAction("О разработчиках");
-    connect(aboutDevsAction, &QAction::triggered, this, &GameWindow::createAboutDevsWindow);
+    __attribute__((unused))
+            QAction *aboutDevsAction = helpMenu->addAction("О разработчиках", this, &GameWindow::createAboutDevsWindow, QKeySequence("F12"));
 
 
     connect(this, &GameWindow::changeColoures, view, &GameView::changeColoures);
