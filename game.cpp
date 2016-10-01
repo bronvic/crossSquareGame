@@ -385,7 +385,7 @@ void GameView::mousePressEvent(QMouseEvent *event)
                 if(gameIsOver()){
                     QDialog *gameOver = new QDialog(this);
                     gameOver->resize(300,100);
-                    gameOver->setMinimumSize(300,100);
+                    gameOver->setFixedSize(300,100);
                     gameOver->setWindowTitle("Конец игры");
 
                     QVBoxLayout *layout = new QVBoxLayout(gameOver);
@@ -521,6 +521,8 @@ void GameView::changeColoures(QPair<Qt::GlobalColor, Qt::GlobalColor> newColoure
     }
 
     colores = newColoures;
+
+    emit changeTurnLabel(turn);
 }
 
 void GameView::clearField()
