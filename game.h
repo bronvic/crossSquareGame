@@ -11,7 +11,7 @@
 #include <QPair>
 
 #include <QComboBox>
-
+#include <QLabel>
 #include <QWidget>
 
 class Cell;
@@ -25,6 +25,7 @@ public:
     GameWindow(QWidget *parent = 0);
 
     GameView *view;
+    QLabel *turnLabel;
 
     void createSettingsWindow();
     void createAboutGameWindow();
@@ -39,6 +40,9 @@ private:
 
 signals:
     void changeColoures(QPair<Qt::GlobalColor, Qt::GlobalColor>);
+
+public slots:
+    void changeTurnLabel(int turn);
 };
 
 class GameView : public QGraphicsView
@@ -56,7 +60,7 @@ public:
 
     void clearField();
 
-    friend void GameWindow::createSettingsWindow();
+    QPair<Qt::GlobalColor, Qt::GlobalColor> colores;
 
 protected:
     static int a;
@@ -74,8 +78,9 @@ private:
     int cellSize;
     QVector<Cell*> cells;
     int turn = 0;
-    QPair<Qt::GlobalColor, Qt::GlobalColor> colores;
 
+signals:
+    void changeTurnLabel(int t);
 
 public slots:
     void changeColoures(QPair<Qt::GlobalColor, Qt::GlobalColor>);

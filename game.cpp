@@ -32,10 +32,25 @@ GameWindow::GameWindow(QWidget *parent)
     QMenuBar *menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
 
+    // задать turn label
+    turnLabel = new QLabel(this);
+    turnLabel->resize(this->width(), menuBar->height());
+    turnLabel->move(turnLabel->pos().x(), turnLabel->pos().y() + menuBar->height());
+    QPalette palette;
+    palette.setColor(QPalette::WindowText, Qt::red);
+    turnLabel->setPalette(palette);
+    turnLabel->setText("Ход игрока 1");
+    turnLabel->setAlignment(Qt::AlignHCenter);
+    QFont f("Mono space");
+    f.setBold(true);
+    f.setPixelSize(20);
+    turnLabel->setFont(f);
+
     // создать сцену
     view = new GameView(this);
-    view->move(view->pos().x(), view->pos().y() + menuBar->height());
+    view->move(view->pos().x(), view->pos().y() + menuBar->height() + turnLabel->height());
 
+    // настроить menubar
     QMenu *gameMenu = new QMenu("Игра", this);
     menuBar->addMenu(gameMenu);
     __attribute__((unused))
@@ -59,13 +74,14 @@ GameWindow::GameWindow(QWidget *parent)
 
 
     connect(this, &GameWindow::changeColoures, view, &GameView::changeColoures);
+    connect(view, &GameView::changeTurnLabel, this, &GameWindow::changeTurnLabel);
 }
 
 void GameWindow::createSettingsWindow()
 {
     settings = new QDialog(this);
     settings->resize(300,100);
-    settings->setMinimumSize(300,100);
+    settings->setFixedSize(300,100);
     settings->setWindowTitle("Настройки");
 
     QGridLayout *layout = new QGridLayout(settings);
@@ -130,7 +146,7 @@ void GameWindow::createAboutGameWindow()
 {
     QDialog *aboutGame = new QDialog(this);
     aboutGame->resize(500,150);
-    aboutGame->setMinimumSize(500,150);
+    aboutGame->setFixedSize(500,150);
     aboutGame->setWindowTitle("Об игре");
 
     QVBoxLayout *layout = new QVBoxLayout(aboutGame);
@@ -154,7 +170,7 @@ void GameWindow::createAboutDevsWindow()
 {
     QDialog *aboutDevs = new QDialog(this);
     aboutDevs->resize(550,150);
-    aboutDevs->setMinimumSize(550,150);
+    aboutDevs->setFixedSize(550,150);
     aboutDevs->setWindowTitle("О разработчиках");
 
     QVBoxLayout *layout = new QVBoxLayout(aboutDevs);
@@ -223,6 +239,20 @@ void GameWindow::setComboboxesColor(QComboBox *box, Qt::GlobalColor color)
     }
 }
 
+void GameWindow::changeTurnLabel(int turn)
+{
+    turnLabel->setText(QString("Ход игрока " + QString::number(turn + 1)));
+
+    QPalette palette;
+    if(!turn % 2)
+        palette.setColor(QPalette::WindowText, view->colores.first);
+    else
+        palette.setColor(QPalette::WindowText, view->colores.second);
+
+    turnLabel->setPalette(palette);
+
+}
+
 GameView::GameView(QWidget *parent)
     : QGraphicsView(parent)
     , oldCrossNum(-1)
@@ -235,8 +265,7 @@ GameView::GameView(QWidget *parent)
     setScene(scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setFixedSize(800,600);
-
+    setFixedSize(scene->width(), scene->height());
 
     // следим за мышью
     setMouseTracking(true);
@@ -394,6 +423,7 @@ void GameView::mousePressEvent(QMouseEvent *event)
                 else
                     turn = (turn + 1) % 2;
 
+                emit(changeTurnLabel(turn));
                 oldCrossNum = -1;
             }
         }
@@ -501,4 +531,5 @@ void GameView::clearField()
     }
 
     turn = 0;
+    emit(changeTurnLabel(turn));
 }
