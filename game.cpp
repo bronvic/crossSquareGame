@@ -319,7 +319,8 @@ void GameView::mousePressEvent(QMouseEvent *event)
             fieldSize * cellSize,
             fieldSize * cellSize);
     if (r.contains(event->pos())) // это клетка!
-    {
+    {// непонятный кусок кода
+        /*
         if(std::all_of(cells.begin(),
                        cells.end(),
                        [](Cell* c) {
@@ -329,7 +330,7 @@ void GameView::mousePressEvent(QMouseEvent *event)
                 c->setColor(Qt::white);
             }
         }
-        else
+        else*/
         {
             curItem = itemAt(event->x(), event->y());
             if(curItem == NULL)// на левой и нижней границе не возвращает клетку на последнем пикселе
@@ -390,9 +391,10 @@ void GameView::mousePressEvent(QMouseEvent *event)
 
                     gameOver->show();
                 }
+                else
+                    turn = (turn + 1) % 2;
 
                 oldCrossNum = -1;
-                turn = (turn + 1) % 2;
             }
         }
     }
@@ -497,4 +499,6 @@ void GameView::clearField()
         if(c->color() != Qt::white || c->color() != Qt::lightGray)
             c->setColor(Qt::white);
     }
+
+    turn = 0;
 }
